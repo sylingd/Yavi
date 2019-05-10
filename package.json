@@ -1,0 +1,36 @@
+{
+  "name": "yavdom",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Yet another vdom implemention",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -r ts-node/register test/**/*.ts",
+    "dev": "webpack-dev-server --env.mode development --open",
+    "start": "npm run dev",
+    "build": "webpack -- --env.mode production",
+    "build:dev": "webpack -- --env.mode development"
+  },
+  "author": "ShuangYa",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "11.9.4",
+    "chai": "^4.2.0",
+    "clean-webpack-plugin": "1.0.1",
+    "compression-webpack-plugin": "2.0.0",
+    "file-loader": "3.0.1",
+    "html-webpack-plugin": "^3.2.0",
+    "mocha": "^6.1.4",
+    "source-map-loader": "0.2.4",
+    "ts-loader": "5.3.3",
+    "ts-node": "^8.1.0",
+    "typescript": "^3.4.5",
+    "uglifyjs-webpack-plugin": "2.1.1",
+    "webpack": "4.29.5",
+    "webpack-cli": "3.2.3",
+    "webpack-dev-server": "3.2.0",
+    "webpack-merge": "4.2.1"
+  }
+}
