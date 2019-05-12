@@ -36,7 +36,7 @@ module.exports = ({
 				filename: '[name].js',
 				sourceMapFilename: '[file].map',
 				path: path.resolve(__dirname, 'dist'),
-				library: "Yav",
+				library: "Yavi",
 				libraryTarget: 'umd',
 				libraryExport: "default",
 				umdNamedDefine: true
