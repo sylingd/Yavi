@@ -31,7 +31,7 @@ export function diff(oldNode: VNode, newNode: VNode | undefined): IChangedNode[]
  */
 function diffVNode(oldNode: VNode, newNode: VNode | undefined, res: IChangedNode[]) {
 	const result: IChangedNode[] = [];
-	if (typeof(newNode) === "undefined") {
+	if (typeof(newNode) === "undefined" || newNode === oldNode) {
 		return;
 	}
 	if (typeof(oldNode.tag) === "undefined" && typeof(newNode.tag) === "undefined") {
@@ -98,13 +98,16 @@ function diffVNodes(oldNodes: VNode[], newNodes: VNode[], res: IChangedNode[]) {
 				type: NodeState.Remove,
 				node: oldNodes[idx]
 			});
-		} else if (index !== idx) {
-			// Node has moved
-			res.push({
-				type: NodeState.Move,
-				node: oldNodes[idx],
-				index: index
-			});
+		} else {
+			if (index !== idx) {
+				// Node has moved
+				res.push({
+					type: NodeState.Move,
+					node: oldNodes[idx],
+					index: index
+				});
+			}
+			diffVNode(oldNodes[idx], newNodes[index], res);
 		}
 	});
 	newNodes.forEach((it, idx) => {

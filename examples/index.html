@@ -15,7 +15,7 @@
 		const vm = new Yav({
 			el: document.getElementById('app')
 		});
-		const root = vm.create('div', {
+		const myroot = vm.create('div', {
 			'id': "test",
 			'key': 'aa'
 		}, [
@@ -28,25 +28,7 @@
 					'key': 'd2'
 				})
 			]);
-		const root2 = vm.create('div', {
-			'id': "test",
-			'key': 'aa'
-		}, [
-				vm.create('div', {
-					'id': "div1",
-					'key': 'd1'
-				}),
-				vm.create('div', {
-					'id': "div3",
-					'key': 'd3'
-				}),
-				vm.create('div', {
-					'id': "div2",
-					'key': 'd2'
-				})
-			]);
-		vm.append(root);
-		vm.patch(root, root2);
+		vm.append(myroot);
 	</script>
 </body>
 

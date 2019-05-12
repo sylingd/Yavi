@@ -14,7 +14,7 @@ export class VNode {
 		key?: string,
 		children?: VNode[]) {
 			this.tag = tag;
-			this.props = props;
+			this.props = props || {};
 			this.state = state;
 			this.key = key;
 			this.text = text;

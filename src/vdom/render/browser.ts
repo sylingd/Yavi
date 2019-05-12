@@ -18,7 +18,6 @@ export function create(vdom: VNode): Element | Node {
 		vdom.node = result;
 		return result;
 	}
-	throw new Error("Unknown vdom");
 }
 
 export function patch(changes: IChangedNode[]) {
@@ -30,7 +29,7 @@ export function patch(changes: IChangedNode[]) {
 				}
 				break;
 			case NodeState.Insert:
-				if (it.node.parent && it.node.parent.node && it.index) {
+				if (it.node.parent && it.node.parent.node && typeof(it.index) !== "undefined") {
 					if (it.node.parent.node.childNodes.length > it.index) {
 						it.node.parent.node.insertBefore(create(it.node), it.node.parent.node.childNodes[it.index]);
 					} else {
@@ -54,7 +53,7 @@ export function patch(changes: IChangedNode[]) {
 				}
 				break;
 			case NodeState.Move:
-				if (it.node.node && it.node.parent && it.node.parent.node && it.index) {
+				if (it.node.node && it.node.parent && it.node.parent.node && typeof(it.index) !== "undefined") {
 					if (it.node.parent.node.childNodes.length > it.index) {
 						it.node.parent.node.insertBefore(it.node.node, it.node.parent.node.childNodes[it.index]);
 					} else {
