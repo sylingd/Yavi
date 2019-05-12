@@ -1,11 +1,12 @@
 export class VNode {
 	tag?: string;
 	key?: string;
-	node?: Node;
+	node?: Node | Element;
 	text?: string;
 	props?: any;
 	state?: any;
 	children?: VNode[];
+	parent?: VNode;
 	constructor(tag?: string,
 		props?: any,
 		state?: any,
@@ -18,6 +19,13 @@ export class VNode {
 			this.key = key;
 			this.text = text;
 			this.children = children;
+			if (this.children) {
+				this.children.forEach(it => it.parent = this);
+			}
+			if (this.props && this.props.key) {
+				this.key = this.props.key;
+				delete this.props.key;
+			}
 			this.node = undefined;
 	}
 }
