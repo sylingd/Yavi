@@ -29,8 +29,8 @@ export function patch(changes: IChangedNode[]) {
 				}
 				break;
 			case NodeState.Insert:
-				if (it.node.parent && it.node.parent.node && typeof(it.index) !== "undefined") {
-					if (it.node.parent.node.childNodes.length > it.index) {
+				if (it.node.parent && it.node.parent.node) {
+					if (typeof(it.index) !== "undefined" && it.node.parent.node.childNodes.length > it.index) {
 						it.node.parent.node.insertBefore(create(it.node), it.node.parent.node.childNodes[it.index]);
 					} else {
 						it.node.parent.node.appendChild(create(it.node));

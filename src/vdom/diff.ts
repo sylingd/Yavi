@@ -17,7 +17,7 @@ interface IChangedProp {
 	value: any;
 }
 
-export function diff(oldNode: VNode, newNode: VNode | undefined): IChangedNode[] {
+export function diff(oldNode: VNode | undefined, newNode: VNode | undefined): IChangedNode[] {
 	const result: IChangedNode[] = [];
 	diffVNode(oldNode, newNode, result);
 	return result;
@@ -29,9 +29,15 @@ export function diff(oldNode: VNode, newNode: VNode | undefined): IChangedNode[]
  * @param oldNode Old VNode
  * @param newNode New VNode
  */
-function diffVNode(oldNode: VNode, newNode: VNode | undefined, res: IChangedNode[]) {
-	const result: IChangedNode[] = [];
-	if (typeof(newNode) === "undefined" || newNode === oldNode) {
+function diffVNode(oldNode: VNode | undefined, newNode: VNode | undefined, res: IChangedNode[]) {
+	if (newNode === oldNode || typeof(newNode) === "undefined") {
+		return;
+	}
+	if (typeof(oldNode) === "undefined") {
+		res.push({
+			type: NodeState.Insert,
+			node: newNode
+		});
 		return;
 	}
 	if (typeof(oldNode.tag) === "undefined" && typeof(newNode.tag) === "undefined") {
@@ -39,20 +45,20 @@ function diffVNode(oldNode: VNode, newNode: VNode | undefined, res: IChangedNode
 			return;
 		} else {
 			// Patch text node
-			result.push({
+			res.push({
 				type: NodeState.Replace,
 				old: oldNode,
 				node: newNode
 			});
 		}
 	}
-	if (newNode.tag === oldNode.tag && newNode.key === oldNode.key) {
+	if (newNode.tag === oldNode.tag) {
 		// Same node
 		newNode.node = oldNode.node;
 		// Check props
 		const props = diffProps(oldNode.props, newNode.props);
 		if (props.length > 0) {
-			result.push({
+			res.push({
 				type: NodeState.Prop,
 				node: oldNode,
 				prop: props
@@ -62,13 +68,12 @@ function diffVNode(oldNode: VNode, newNode: VNode | undefined, res: IChangedNode
 		diffVNodes(oldNode.children || [], newNode.children || [], res);
 	} else {
 		// Just replace it
-		result.push({
+		res.push({
 			type: NodeState.Replace,
 			old: oldNode,
 			node: newNode
 		});
 	}
-	res = res.concat(result);
 }
 
 /**
