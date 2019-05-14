@@ -86,46 +86,47 @@ function diffVNode(oldNode: VNode | undefined, newNode: VNode | undefined, res: 
 function diffVNodes(oldNodes: VNode[], newNodes: VNode[], res: IChangedNode[]) {
 	// Get keys
 	const oldKeys = oldNodes.map(it => it.key);
-	const newKeys = newNodes.map(it => it.key);
-	// If exists in oldKeys but not in newKeys, remove it
-	oldKeys.forEach((it, idx) => {
-		// Hove not key, remove it
-		if (!it) {
-			res.push({
-				type: NodeState.Remove,
-				node: oldNodes[idx]
-			});
-			return;
-		}
-		const index = newKeys.indexOf(it);
-		if (index === -1) {
-			res.push({
-				type: NodeState.Remove,
-				node: oldNodes[idx]
-			});
-		} else {
-			if (index !== idx) {
-				// Node has moved
-				res.push({
-					type: NodeState.Move,
-					node: oldNodes[idx],
-					index: index
-				});
-			}
-			diffVNode(oldNodes[idx], newNodes[index], res);
-		}
-	});
 	newNodes.forEach((it, idx) => {
-		// Hove not key, render it
-		if (!it.key) {
-			res.push({
-				type: NodeState.Insert,
-				node: it,
-				index: idx
-			});
-			return;
-		}
-		if (!oldKeys.includes(it.key)) {
+		// If has key, use key to check it
+		if (it.key) {
+			const index = oldKeys.indexOf(it.key);
+			if (index === -1) {
+				// If exists in new but not in old, insert it
+				res.push({
+					type: NodeState.Insert,
+					node: it,
+					index: idx
+				});
+			} else {
+				if (index !== idx) {
+					// Node has moved
+					it.node = oldNodes[index].node;
+					res.push({
+						type: NodeState.Move,
+						node: it,
+						index: idx
+					});
+				}
+				diffVNode(oldNodes[index], it, res);
+			}
+		} else {
+			// find same node, check its type
+			for (let index = 0; index < oldNodes.length; index++) {
+				if (!oldNodes[index].key && isSameType(it, oldNodes[index])) {
+					// Node has moved
+					it.node = oldNodes[index].node;
+					if (index !== idx) {
+						res.push({
+							type: NodeState.Move,
+							node: it,
+							index: idx
+						});
+					}
+					diffVNode(oldNodes[index], it, res);
+					oldNodes.splice(index, 1);
+					return;
+				}
+			}
 			res.push({
 				type: NodeState.Insert,
 				node: it,
@@ -133,6 +134,18 @@ function diffVNodes(oldNodes: VNode[], newNodes: VNode[], res: IChangedNode[]) {
 			});
 		}
 	});
+	oldNodes.forEach(it => {
+		if (!it.key) {
+			res.unshift({
+				type: NodeState.Remove,
+				node: it
+			});
+		}
+	});
+}
+
+function isSameType(node1: VNode, node2: VNode): boolean {
+	return node1.tag === node2.tag;
 }
 
 /**
@@ -145,7 +158,7 @@ function diffVNodes(oldNodes: VNode[], newNodes: VNode[], res: IChangedNode[]) {
 function diffProps(oldProps: any, newProps: any): IChangedProp[] {
 	const result: IChangedProp[] = [];
 	Object.keys(oldProps).forEach(it => {
-		if (newProps.hasOwnProperty(it)) {
+		if (!newProps.hasOwnProperty(it)) {
 			result.push({
 				name: it,
 				value: undefined

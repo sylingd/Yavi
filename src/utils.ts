@@ -14,6 +14,6 @@ export function normalizeChildren(children: (VNode | string | VNode[])[]): VNode
 	return res;
 }
 
-export function createElement(tag: string, props: any, children?: (VNode | string | VNode[])[]) {
-	return createVNode(tag, props, children);
+export function createElement(tag?: string, props?: any, children?: (VNode | string | VNode[])[]) {
+	return tag ? createVNode(tag, props, children) : createText(props);
 }

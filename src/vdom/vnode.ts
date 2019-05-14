@@ -32,7 +32,7 @@ export class VNode {
 }
 
 export function createText(text: string) {
-	return new VNode(undefined, undefined, undefined, text);
+	return new VNode(undefined, undefined, text);
 }
 
 export function create(tag: string, props: any, children?: (VNode | string | VNode[])[]) {

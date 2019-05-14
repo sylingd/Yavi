@@ -48,6 +48,8 @@ export function patch(changes: IChangedNode[]) {
 					it.prop.forEach(prop => {
 						if (prop.value) {
 							el.setAttribute(prop.name, prop.value);
+						} else {
+							el.removeAttribute(prop.name);
 						}
 					});
 				}
