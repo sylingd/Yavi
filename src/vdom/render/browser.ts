@@ -11,12 +11,9 @@ export default class Browser implements IRender<Node> {
 			if (node.props && Object.keys(node.props).length > 0) {
 				Object.keys(node.props).forEach(it => result.setAttribute(it, node.props[it]));
 			}
-			node.node = result;
 			return result;
 		} else {
-			const result = document.createTextNode(node.text || "");
-			node.node = result;
-			return result;
+			return document.createTextNode(node.text || "");
 		}
 	}
 	public replace(parent: Node, oldNode: any, newNode: any) {
