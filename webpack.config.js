@@ -51,7 +51,10 @@ module.exports = ({
 			},
 			plugins: [
 				new CleanWebpackPlugin(['dist'])
-			]
+			],
+			node: {
+				setImmediate: false
+			}
 		},
 		modeConfig(mode)
 	);

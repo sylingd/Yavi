@@ -1,4 +1,4 @@
-import { VNode } from './vnode';
+import { VNode } from '@src/vdom/vnode';
 
 export const enum NodeState {
 	Remove, Insert, Prop, Replace, Move
@@ -12,13 +12,31 @@ export interface IChangedNode {
 	prop?: IChangedProp[];
 }
 
-interface IChangedProp {
+export interface IChangedProp {
 	name: string;
 	value: any;
 }
 
 export function diff(oldNode: VNode | undefined, newNode: VNode | undefined): IChangedNode[] {
 	const result: IChangedNode[] = [];
+	if (typeof(newNode) === "undefined") {
+		if (typeof(oldNode) !== "undefined") {
+			result.push({
+				type: NodeState.Remove,
+				node: oldNode
+			});
+		}
+		return result;
+	}
+	if (typeof(oldNode) === "undefined") {
+		if (typeof(newNode) !== "undefined") {
+			result.push({
+				type: NodeState.Insert,
+				node: newNode
+			});
+		}
+		return result;
+	}
 	diffVNode(oldNode, newNode, result);
 	return result;
 }
@@ -29,18 +47,11 @@ export function diff(oldNode: VNode | undefined, newNode: VNode | undefined): IC
  * @param oldNode Old VNode
  * @param newNode New VNode
  */
-function diffVNode(oldNode: VNode | undefined, newNode: VNode | undefined, res: IChangedNode[]) {
-	if (newNode === oldNode || typeof(newNode) === "undefined") {
+function diffVNode(oldNode: VNode, newNode: VNode, res: IChangedNode[]) {
+	if (newNode === oldNode) {
 		return;
 	}
-	if (typeof(oldNode) === "undefined") {
-		res.push({
-			type: NodeState.Insert,
-			node: newNode
-		});
-		return;
-	}
-	if (typeof(oldNode.tag) === "undefined" && typeof(newNode.tag) === "undefined") {
+	if (typeof(oldNode.type) === "undefined" && typeof(newNode.type) === "undefined") {
 		if (oldNode.text === newNode.text) {
 			return;
 		} else {
@@ -52,7 +63,7 @@ function diffVNode(oldNode: VNode | undefined, newNode: VNode | undefined, res: 
 			});
 		}
 	}
-	if (newNode.tag === oldNode.tag) {
+	if (isSameType(oldNode, newNode)) {
 		// Same node
 		newNode.node = oldNode.node;
 		// Check props
@@ -145,7 +156,10 @@ function diffVNodes(oldNodes: VNode[], newNodes: VNode[], res: IChangedNode[]) {
 }
 
 function isSameType(node1: VNode, node2: VNode): boolean {
-	return node1.tag === node2.tag;
+	if (typeof(node1.type) === "object" && typeof(node2.type) === "object") {
+		return node1.type.__proto__ === node2.type.__proto__;
+	}
+	return node1.type === node2.type;
 }
 
 /**

@@ -1,4 +1,4 @@
-import { create as createVNode, createText, VNode } from './vdom/vnode';
+import { create as createVNode, createText, VNode } from '@src/vdom/vnode';
 
 export function normalizeChildren(children: (VNode | string | VNode[])[]): VNode[] {
 	let res: VNode[] = [];
@@ -14,6 +14,6 @@ export function normalizeChildren(children: (VNode | string | VNode[])[]): VNode
 	return res;
 }
 
-export function createElement(tag?: string, props?: any, children?: (VNode | string | VNode[])[]) {
-	return tag ? createVNode(tag, props, children) : createText(props);
+export function createElement(type: any, props?: any, children?: (VNode | string | VNode[])[]) {
+	return type ? createVNode(type, props, children) : createText(props);
 }

@@ -1,7 +1,7 @@
-import { VNode } from './vdom/vnode';
-import { diff } from './vdom/diff';
+import { VNode } from '@src/vdom/vnode';
+import { diff } from '@src/vdom/diff';
 import * as utils from '@src/utils';
-import * as browser from './vdom/render/browser';
+import Context from '@src/context';
 
 export default abstract class Component<P, T> {
 	private state: T;
@@ -17,7 +17,6 @@ export default abstract class Component<P, T> {
 			});
 		}
 		this.props = props;
-		this.update();
 	}
 	public update() {
 		const newNode = this.render();
@@ -27,7 +26,7 @@ export default abstract class Component<P, T> {
 	public patch(newNode: VNode) {
 		const d = diff(this.node, newNode);
 		console.log(d);
-		browser.patch(d);
+		Context.updateQueue.add(d);
 	}
 	public setState(newState: T) {
 		this.state = newState;
