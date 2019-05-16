@@ -13,33 +13,28 @@
 	<script src="../dist/main.js"></script>
 	<script>
 		class TestComponent extends Yavi.Component {
+			constructor(props) {
+				super(props);
+				this.state = {
+					num: 1
+				};
+				setInterval(() => {
+					this.state.num++;
+				}, 2000);
+			}
 			render() {
-				return Yavi.createElement('p', {}, this.props.text);
+				return Yavi.createElement('div', {}, [
+					Yavi.createElement('p', {}, "A: " + this.state.num),
+					Yavi.createElement('p', {}, "B: " + this.state.num)
+				]);
 			}
 		}
-		let total = 5;
 		const vm = new Yavi({
 			el: document.getElementById('app'),
 			render: function () {
-				const child = [];
-				for (let i = 0; i < total; i++) {
-					const newNode = Yavi.createElement(TestComponent, {
-						id: 'item-' + i,
-						key: 'item-' + i,
-						text: i
-					});
-					child.push(newNode);
-				}
-				return Yavi.createElement('div', {
-					'id': "test",
-					'key': 'aa'
-				}, child);
+				return Yavi.createElement(TestComponent);
 			}
 		});
-		setTimeout(() => {
-			total++;
-			vm.update();
-		}, 2000);
 	</script>
 </body>
 

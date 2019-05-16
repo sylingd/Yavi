@@ -17,3 +17,7 @@ export function normalizeChildren(children: (VNode | string | VNode[])[]): VNode
 export function createElement(type: any, props?: any, children?: (VNode | string | VNode[])[]) {
 	return type ? createVNode(type, props, children) : createText(props);
 }
+
+export function isArray(obj: any) {
+	return typeof(obj) === "object" && obj instanceof Array;
+}

@@ -28,7 +28,7 @@ export default class Root {
 	}
 	public render(): VNode {
 		const res = this.options.render.apply(this);
-		res.parent = this.createRoot();
+		res.setParent(this.createRoot());
 		return res;
 	}
 	public update() {

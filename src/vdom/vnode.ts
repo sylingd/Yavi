@@ -22,34 +22,22 @@ export class VNode {
 			}
 			if (typeof(type) === "function" && type.prototype instanceof Component) {
 				type = new type(this.props);
+				type.created();
 			}
 			this.type = type;
 			this.text = text;
 			this.children = children;
 			if (this.children) {
-				this.children.forEach(it => it.parent = this);
+				this.children.forEach(it => it.setParent(this));
 			}
 			this.node = undefined;
 	}
-}
-
-export function render(node: VNode): VNode {
-	if (typeof(node.type) === "string" || typeof(node.type) === "undefined") {
-		return node;
-	}
-	let currentNode = node;
-	while (true) {
-		if (typeof(currentNode.type) === "string" || typeof(currentNode.type) === "undefined") {
-			break;
-		} else if (isFunctionComponent(node)) {
-			currentNode = node.type.apply(node);
-		} else if (isClassComponent(node)) {
-			currentNode = node.type.render();
-		} else {
-			throw new Error("Unknow node");
+	public setParent(parent: VNode) {
+		this.parent = parent;
+		if (this.type instanceof Component) {
+			this.type.parent = parent;
 		}
 	}
-	return currentNode;
 }
 
 export function isComponent(node: VNode) {

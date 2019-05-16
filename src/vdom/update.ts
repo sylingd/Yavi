@@ -1,6 +1,6 @@
 import { IChangedNode, NodeState } from '@src/vdom/diff';
 import Context from '@src/context';
-import { render as renderVNode, VNode, isComponent } from '@src/vdom/vnode';
+import { VNode, isComponent } from '@src/vdom/vnode';
 
 export default class Update {
 	private queue: IChangedNode[];
@@ -32,18 +32,27 @@ export default class Update {
 	private executeOne(task: IChangedNode) {
 		switch (task.type) {
 			case NodeState.Replace:
-				if (task.node.parent && task.old) {
-					const node = this.createNode(task.node);
-					task.node.node = node;
-					Context.render.replace(task.node.parent.node, task.old.node, node);
+				if (task.node.parent && task.old && !isComponent(task.node)) {
+					if (isComponent(task.node)) {
+						task.node.type.update();
+					} else {
+						const node = Context.render.create(task.node);
+						task.node.node = node;
+						Context.render.replace(task.node.parent.node, task.old.node, node);
+						this.createChild(task.node);
+					}
 				}
-				this.createChild(task.node);
 				break;
 			case NodeState.Insert:
 				if (task.node.parent) {
-					const node = this.createNode(task.node);
-					task.node.node = node;
-					Context.render.insert(task.node.parent.node, node, task.index);
+					if (isComponent(task.node)) {
+						task.node.type.update();
+					} else {
+						const node = Context.render.create(task.node);
+						task.node.node = node;
+						Context.render.insert(task.node.parent.node, node, task.index);
+						this.createChild(task.node);
+					}
 				}
 				break;
 			case NodeState.Remove:
@@ -63,24 +72,12 @@ export default class Update {
 				break;
 		}
 	}
-	private createNode(node: VNode): any {
-		let res;
-		if (isComponent(node)) {
-			const vnode = renderVNode(node);
-			res = Context.render.create(vnode);
-			this.createChild(vnode);
-		} else {
-			res = Context.render.create(node);
-			this.createChild(node);
-		}
-		return res;
-	}
 	private createChild(node: VNode) {
 		if (!node.children) {
 			return;
 		}
 		node.children.forEach((it, idx) => {
-			it.parent = node;
+			it.setParent(node);
 			this.add({
 				type: NodeState.Insert,
 				node: it,
