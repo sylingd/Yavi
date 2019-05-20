@@ -31,6 +31,7 @@
 		"scripts",
 		"webpack",
 		"test",
-		"webpack.config.js"
+		"webpack.config.js",
+		"dist/"
 	]
 }

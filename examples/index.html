@@ -16,16 +16,32 @@
 			constructor(props) {
 				super(props);
 				this.state = {
-					num: 1
+					num: 1,
+					increase: true
 				};
-				setInterval(() => {
-					this.state.num++;
-				}, 2000);
+				this.increase = this.increase.bind(this);
+				this.decrease = this.decrease.bind(this);
+			}
+			rand() {
+				return Math.round(Math.random() * 10);
+			}
+			increase() {
+				this.state.num += this.rand();
+				this.state.increase = !this.state.increase;
+			}
+			decrease() {
+				this.state.num -= this.rand();
+				this.state.increase = !this.state.increase;
 			}
 			render() {
 				return Yavi.createElement('div', {}, [
-					Yavi.createElement('p', {}, "A: " + this.state.num),
-					Yavi.createElement('p', {}, "B: " + this.state.num)
+					Yavi.createElement('button', {
+						onClick: this.state.increase ? this.increase : this.decrease
+					}, this.state.increase ? "Increase" : "Decrease"),
+					Yavi.createElement('p', {}, [
+						Yavi.createElement('span', {}, "num: "),
+						Yavi.createElement('span', {}, this.state.num)
+					])
 				]);
 			}
 		}

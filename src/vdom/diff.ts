@@ -14,6 +14,7 @@ export interface IChangedNode {
 
 export interface IChangedProp {
 	name: string;
+	old: any;
 	value: any;
 }
 
@@ -52,9 +53,7 @@ function diffVNode(oldNode: VNode, newNode: VNode, res: IChangedNode[]) {
 		return;
 	}
 	if (typeof(oldNode.type) === "undefined" && typeof(newNode.type) === "undefined") {
-		if (oldNode.text === newNode.text) {
-			return;
-		} else {
+		if (oldNode.text !== newNode.text) {
 			// Patch text node
 			res.push({
 				type: NodeState.Replace,
@@ -62,6 +61,7 @@ function diffVNode(oldNode: VNode, newNode: VNode, res: IChangedNode[]) {
 				node: newNode
 			});
 		}
+		return;
 	}
 	if (isSameType(oldNode, newNode)) {
 		// Same node
@@ -97,6 +97,7 @@ function diffVNode(oldNode: VNode, newNode: VNode, res: IChangedNode[]) {
 function diffVNodes(oldNodes: VNode[], newNodes: VNode[], res: IChangedNode[]) {
 	// Get keys
 	const oldKeys = oldNodes.map(it => it.key);
+	const skipOldNodes: number[] = [];
 	newNodes.forEach((it, idx) => {
 		// If has key, use key to check it
 		if (it.key) {
@@ -123,7 +124,7 @@ function diffVNodes(oldNodes: VNode[], newNodes: VNode[], res: IChangedNode[]) {
 		} else {
 			// find same node, check its type
 			for (let index = 0; index < oldNodes.length; index++) {
-				if (!oldNodes[index].key && isSameType(it, oldNodes[index])) {
+				if (!oldNodes[index].key && !skipOldNodes.includes(index) && isSameType(it, oldNodes[index])) {
 					// Node has moved
 					it.node = oldNodes[index].node;
 					if (index !== idx) {
@@ -134,7 +135,7 @@ function diffVNodes(oldNodes: VNode[], newNodes: VNode[], res: IChangedNode[]) {
 						});
 					}
 					diffVNode(oldNodes[index], it, res);
-					oldNodes.splice(index, 1);
+					skipOldNodes.push(index);
 					return;
 				}
 			}
@@ -145,8 +146,8 @@ function diffVNodes(oldNodes: VNode[], newNodes: VNode[], res: IChangedNode[]) {
 			});
 		}
 	});
-	oldNodes.forEach(it => {
-		if (!it.key) {
+	oldNodes.forEach((it, idx) => {
+		if (!it.key && !skipOldNodes.includes(idx)) {
 			res.unshift({
 				type: NodeState.Remove,
 				node: it
@@ -175,6 +176,7 @@ function diffProps(oldProps: any, newProps: any): IChangedProp[] {
 		if (!newProps.hasOwnProperty(it)) {
 			result.push({
 				name: it,
+				old: oldProps[it],
 				value: undefined
 			});
 		}
@@ -184,12 +186,14 @@ function diffProps(oldProps: any, newProps: any): IChangedProp[] {
 			if (newProps[it] !== oldProps[it]) {
 				result.push({
 					name: it,
+					old: oldProps[it],
 					value: newProps[it]
 				});
 			}
 		} else {
 			result.push({
 				name: it,
+				old: undefined,
 				value: newProps[it]
 			});
 		}
